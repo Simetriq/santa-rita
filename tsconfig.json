@@ -2,8 +2,9 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "experimentalDecorators": true,      
-    "emitDecoratorMetadata": true,       
-    "allowSyntheticDefaultImports": true
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
+    "useDefineForClassFields": false
   }
 }

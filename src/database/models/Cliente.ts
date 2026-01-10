@@ -2,15 +2,14 @@
 import { Model } from '@nozbe/watermelondb'
 import { field, text, json } from '@nozbe/watermelondb/decorators'
 
-// Interfaz para los productos del remito
 export interface ProductoRemito {
-    codigo: string;           // Código de barras del producto
-    articulo: string;         // Nombre del artículo
-    cantidad: number;         // Cantidad (bultos/unidades)
-    empaque: 'Bulto' | 'Unidad'; // Tipo de empaque
-    cxe: number;              // Cantidad por empaque
-    precioUnitario: number;   // Precio por unidad
-    montoTotal: number;       // Monto total (cantidad * precioUnitario)
+    codigo: string;
+    articulo: string;
+    cantidad: number;
+    empaque: 'Bulto' | 'Unidad';
+    cxe: number;
+    precioUnitario: number;
+    montoTotal: number;
 }
 
 export default class Cliente extends Model {
@@ -22,15 +21,13 @@ export default class Cliente extends Model {
     @text('telefono') telefono?: string
 
     // === DATOS DEL REMITO ===
-    @text('numero_remito') numeroRemito?: string // Ej: "201656"
-    @text('codigo_cliente') codigoCliente?: string // Ej: "CARTEOS 336.100"
+    @text('numero_remito') numeroRemito?: string
+    @text('codigo_cliente') codigoCliente?: string
 
-    // === PRODUCTOS DEL REMITO (JSON) ===
+    // === PRODUCTOS DEL REMITO ===
     @json('productos_remito', (rawProducts: any): ProductoRemito[] => {
-        if (!rawProducts) return [];
-        if (Array.isArray(rawProducts)) return rawProducts;
-        return [];
-    }) productosRemito?: ProductoRemito[];
+        return rawProducts || []
+    }) productosRemito?: ProductoRemito[]
 
     // === RESUMEN ===
     @field('total_remito') totalRemito?: number
@@ -41,16 +38,39 @@ export default class Cliente extends Model {
     @field('activo') activo?: boolean
     @field('saldo') saldo?: number
 
-    // Método para obtener productos como array
-    get productos(): ProductoRemito[] {
-        return this.productosRemito || [];
+    // === MÉTODOS HELPER ===
+
+    // Método estático para crear un cliente
+    static prepareCreate(clienteData: Partial<Cliente>) {
+        return (cliente: Cliente) => {
+            cliente.nombre = clienteData.nombre || ''
+            cliente.direccion = clienteData.direccion || ''
+            cliente.telefono = clienteData.telefono
+            cliente.numeroRemito = clienteData.numeroRemito
+            cliente.codigoCliente = clienteData.codigoCliente
+            cliente.productosRemito = clienteData.productosRemito || []
+            cliente.totalRemito = clienteData.totalRemito || 0
+            cliente.cantidadProductos = clienteData.cantidadProductos || 0
+            cliente.categoria = clienteData.categoria || 'A'
+            cliente.activo = clienteData.activo ?? true
+            cliente.saldo = clienteData.saldo || 0
+        }
     }
 
-    // Método para calcular total automáticamente
+    // Getters
+    get productos(): ProductoRemito[] {
+        return this.productosRemito || []
+    }
+
+    get totalCalculado(): number {
+        return this.calcularTotalRemito()
+    }
+
+    // Método para calcular total
     calcularTotalRemito(): number {
-        if (!this.productosRemito) return 0;
+        if (!this.productosRemito) return 0
         return this.productosRemito.reduce((total, producto) => {
-            return total + (producto.montoTotal || 0);
-        }, 0);
+            return total + (producto.montoTotal || 0)
+        }, 0)
     }
 }

@@ -1,7 +1,7 @@
 // src/database/schema.ts
 import { appSchema, tableSchema } from '@nozbe/watermelondb'
 
-export default appSchema({
+export const schema = appSchema({
     version: 1,
     tables: [
         tableSchema({
@@ -31,3 +31,5 @@ export default appSchema({
         }),
     ]
 })
+
+export default schema

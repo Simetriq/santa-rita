@@ -1,7 +1,7 @@
 // App.tsx
 import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
-import { database } from './src/database'
+import { database } from './src/database/index'
 import HomeScreen from './src/screens/Home/HomeScreen'
 
 export default function App() {

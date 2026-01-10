@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, Button, FlatList } from 'react-native'
-import { database } from '../../database'
+import { database } from '../../database/index'
 import Cliente from '../../database/models/Cliente'
 
 export default function HomeScreen() {
