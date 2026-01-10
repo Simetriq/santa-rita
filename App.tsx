@@ -1,20 +1,50 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// App.tsx
+import React, { useEffect, useState } from 'react'
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
+import { database } from './src/database'
+import HomeScreen from './src/screens/Home/HomeScreen'
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+  const [dbReady, setDbReady] = useState(false)
+
+  useEffect(() => {
+    const initDB = async () => {
+      try {
+        // Esperar a que la base de datos esté lista
+        await database.adapter.getLocal('init')
+        setDbReady(true)
+        console.log('✅ Base de datos lista')
+      } catch (error) {
+        console.log('Base de datos inicializada')
+        setDbReady(true)
+      }
+    }
+
+    initDB()
+  }, [])
+
+  if (!dbReady) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#2E7D32" />
+        <Text style={styles.loadingText}>Inicializando base de datos...</Text>
+      </View>
+    )
+  }
+
+  return <HomeScreen />
 }
 
 const styles = StyleSheet.create({
-  container: {
+  loadingContainer: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
   },
-});
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: '#666',
+  },
+})
