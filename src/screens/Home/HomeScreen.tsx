@@ -25,11 +25,36 @@ export default function HomeScreen() {
 
     const agregarClienteDemo = async () => {
         await database.write(async () => {
-            await database.collections.get<Cliente>('clientes').create(cliente => {
+            await database.collections.get<Cliente>('clientes').create((cliente: Cliente) => {
                 cliente.nombre = `Cliente ${Date.now()}`
                 cliente.telefono = '123456789'
                 cliente.direccion = 'Dirección demo'
                 cliente.categoria = 'A'
+
+                // Datos del remito
+                cliente.numeroRemito = `R-${Date.now()}`
+                cliente.codigoCliente = `C-${Math.floor(Math.random() * 1000)}`
+
+                // Productos del remito (ejemplo)
+                cliente.productosRemito = [
+                    {
+                        codigo: 'P001',
+                        articulo: 'Producto Demo',
+                        cantidad: 2,
+                        empaque: 'Unidad',
+                        cxe: 1,
+                        precioUnitario: 100,
+                        montoTotal: 200,
+                    },
+                ]
+
+                // Resumen
+                cliente.totalRemito = cliente.productosRemito.reduce((t, p) => t + (p.montoTotal || 0), 0)
+                cliente.cantidadProductos = cliente.productosRemito.reduce((t, p) => t + (p.cantidad || 0), 0)
+
+                // Comerciales
+                cliente.activo = true
+                cliente.saldo = 0
             })
         })
         cargarClientes()
@@ -53,6 +78,10 @@ export default function HomeScreen() {
                             <Text style={styles.clienteNombre}>{item.nombre}</Text>
                             <Text>Categoría: {item.categoria}</Text>
                             <Text>Tel: {item.telefono}</Text>
+                            <Text>Remito: {item.numeroRemito ?? '-'}</Text>
+                            <Text>Total remito: {item.totalRemito ?? 0}</Text>
+                            <Text>Saldo: {item.saldo ?? 0}</Text>
+                            <Text>Activo: {item.activo ? 'Sí' : 'No'}</Text>
                         </View>
                     )}
                     style={styles.lista}
